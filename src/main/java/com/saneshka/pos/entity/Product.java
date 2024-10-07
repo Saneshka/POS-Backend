@@ -6,9 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Getter
@@ -32,5 +37,9 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "catId")
     private Category category;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "orderedProducts")
+    private List<Order> orders;
 
 }
