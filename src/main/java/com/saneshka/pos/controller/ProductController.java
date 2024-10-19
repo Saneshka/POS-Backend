@@ -2,6 +2,7 @@ package com.saneshka.pos.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.saneshka.pos.dto.ProductReqDTO;
 import com.saneshka.pos.entity.Category;
 import com.saneshka.pos.entity.Product;
+import com.saneshka.pos.entity.Stock;
 import com.saneshka.pos.service.CategoryService;
 import com.saneshka.pos.service.ProductService;
+import com.saneshka.pos.service.StockService;
 
 import java.util.List;
 
@@ -29,6 +32,9 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private StockService stockService;
+
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> productList = productService.getAllProducts();
@@ -36,6 +42,7 @@ public class ProductController {
     }
 
     @PostMapping("/products")
+    @Transactional
     public ResponseEntity<Product> createProduct(@RequestBody ProductReqDTO productReqDTO) {
         try {
             Product newProduct = new Product();
@@ -49,10 +56,17 @@ public class ProductController {
             newProduct.setCategory(category);
 
             Product createdProduct = productService.createProduct(newProduct);
+            if (createdProduct != null) {
+                Stock newStock = new Stock();
+                newStock.setQty(0);
+                newStock.setProduct(createdProduct);
+                stockService.createStock(newStock);
+            }
             return ResponseEntity.status(201).body(createdProduct);
         } catch (Exception e) {
             // TODO: handle exception
-            return ResponseEntity.status(400).body(null);
+            throw e;
+            // return ResponseEntity.status(400).body(null);
         }
     }
 
@@ -82,13 +96,15 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable long productId) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
         try {
+            Product deletingProduct = productService.getProductById(productId);
+            stockService.deleteStock(deletingProduct.getStock().getId());
             productService.deleteProduct(productId);
             return ResponseEntity.status(200).body("Product Deleted");
         } catch (Exception e) {
             // TODO: handle exception
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(400).body("Error deleting product: " + e.getMessage());
         }
     }
 }

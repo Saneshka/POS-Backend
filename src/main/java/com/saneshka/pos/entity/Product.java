@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,7 +45,7 @@ public class Product {
     private List<Order> orders;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "product")
-    private List<Stock> stock;
+    @OneToOne(mappedBy = "product")
+    private Stock stock;
 
 }
