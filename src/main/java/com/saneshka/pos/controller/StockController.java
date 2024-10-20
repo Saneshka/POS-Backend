@@ -33,6 +33,13 @@ public class StockController {
         return ResponseEntity.status(200).body(stockList);
     }
 
+    @GetMapping("/stocks/{id}")
+    public ResponseEntity<Stock> getStockById(@PathVariable Long id) {
+        Product product = productService.getProductById(id);
+        Stock stock = stockService.getStockByProduct(product);
+        return ResponseEntity.status(200).body(stock);
+    }
+
     @PostMapping("/stocks")
     public ResponseEntity<Stock> createStock(@RequestBody StockDTO stockDTO) {
         try {

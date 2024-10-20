@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.saneshka.pos.entity.Product;
 import com.saneshka.pos.entity.Stock;
 import com.saneshka.pos.repository.StockRepository;
 
@@ -46,6 +47,11 @@ public class StockServiceImpl implements StockService {
     @Override
     public void deleteStock(Long id) {
         stockRepository.deleteById(id);
+    }
+
+    @Override
+    public Stock getStockByProduct(Product product) {
+        return stockRepository.findByProduct(product).orElse(null);
     }
 
 }
