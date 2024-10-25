@@ -51,7 +51,7 @@ public class StockController {
 
             Stock createdStock = stockService.createStock(newStock);
 
-            return ResponseEntity.status(200).body(createdStock);
+            return ResponseEntity.status(201).body(createdStock);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(null);
         }
